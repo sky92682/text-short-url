@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>短网址 Short URL</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
+</head>
+<body>
+<div id="app">
+    <div class="container is-fulled">
+        <div class="field is-grouped">
+            <p class="control is-expanded">
+                <input name="url" ref="url" v-model="url" class="input" type="text" placeholder="输入地址" />
+            </p>
+            <p class="control">
+                <button class="button is-info" v-on:click="submit">转换</button>
+            </p>
+        </div>
+        <div class="field" v-show=short>
+            <div class="control">
+                <p class="help is-normal"><a v-bind:href="''+short+''" target="_blank">[[ short ]]</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    data: {
+        url: "",
+        short: "",
+    },
+    methods: {
+        submit: function () {
+            this.$http.get("/api", {params: {url:this.url}}).then(response => {
+                if (response.data.code === 200) {
+                    this.short = response.data.data
+                } else {
+                    this.short = response.data.msg
+                }
+            }, response => {
+                this.short = response.data.msg
+            });
+        }
+    },
+    mounted: function () {
+        this.$refs.url.focus();
+    }
+})
+</script>
+</body>
+</html>
